@@ -1,0 +1,28 @@
+// --- السحب التلقائي (قراءة الملف الجاهز) ---
+        async function fetchLatestData() {
+            const btn = document.getElementById('btnFetch');
+            const statusMsg = document.getElementById('statusMsg');
+            const uploadSection = document.getElementById('uploadSection');
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحميل الشبكة الطبية...';
+            statusMsg.style.display = 'none';
+
+            try {
+                const response = await fetch('/network_data.json');
+                if (!response.ok) throw new Error("الملف غير موجود");
+                
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    saveAndInitData(result.data, `<i class="fas fa-check-circle"></i> تم تحميل الشبكة بنجاح!`);
+                } else throw new Error(result.message);
+            } catch (error) {
+                btn.style.display = 'none';
+                statusMsg.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i> تعذر جلب البيانات التلقائية.<br><br>
+                    <strong>أضف البيانات بشكل يدوي عبر رفع ملف الـ PDF.</strong>`;
+                statusMsg.className = 'status-msg status-error';
+                statusMsg.style.display = 'block';
+                uploadSection.style.display = 'block';
+            }
+        }
